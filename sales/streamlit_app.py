@@ -76,12 +76,11 @@ else:
         conn.close()
         return df
     def add_user(username, name, password):
-        hashed_password = stauth.Hasher.hash(password)
         conn = sqlite3.connect('sales_management.db')
         c = conn.cursor()
         try:
             c.execute("INSERT INTO users (username, name, password) VALUES (?, ?, ?)",
-                      (username, name, hashed_password))
+                      (username, name, password))
             conn.commit()
             st.success("تم إضافة المستخدم")
         except sqlite3.IntegrityError:
