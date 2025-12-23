@@ -68,7 +68,7 @@ authenticator = stauth.Authenticate(
     cookie_expiry_days=30
 )
 
-name, authentication_status, username = authenticator.login("تسجيل الدخول", "main")
+name, authentication_status, username = authenticator.login("تسجيل الدخول", location="main")
 
 if authentication_status == False:
     st.error("اسم المستخدم أو كلمة المرور غير صحيحة")
