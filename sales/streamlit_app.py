@@ -10,6 +10,11 @@ from PIL import Image
 def init_db():
     conn = sqlite3.connect('sales_management.db')
     c = conn.cursor()
+    c.execute('''CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY,
+                    username TEXT UNIQUE,
+                    name TEXT,
+                    password TEXT)''')
     c.execute('''CREATE TABLE IF NOT EXISTS products (
                     id INTEGER PRIMARY KEY,
                     name TEXT UNIQUE,
@@ -53,6 +58,23 @@ if not st.session_state.logged_in:
 else:
 
     # وظائف قاعدة البيانات
+    def add_user(username, name, password):
+        conn = sqlite3.connect('sales_management.db')
+        c = conn.cursor()
+        try:
+            c.execute("INSERT INTO users (username, name, password) VALUES (?, ?, ?)",
+                      (username, name, password))
+            conn.commit()
+            st.success("تم إضافة المستخدم")
+        except sqlite3.IntegrityError:
+            st.error("اسم المستخدم موجود بالفعل")
+        conn.close()
+
+    def get_users():
+        conn = sqlite3.connect('sales_management.db')
+        df = pd.read_sql_query("SELECT id, username, name FROM users", conn)
+        conn.close()
+        return df
     def add_user(username, name, password):
         hashed_password = stauth.Hasher.hash(password)
         conn = sqlite3.connect('sales_management.db')
@@ -201,6 +223,23 @@ else:
         else:
             sales_df = get_sales()
         st.dataframe(sales_df)
+
+    with tab3:
+        st.header("إدارة الائتمان")
+        with st.form("add_credit"):
+            customer_name = st.text_input("اسم العميل")
+            product_name = st.text_input("اسم المنتج")
+            quantity = st.number_input("الكمية", min_value=1)
+            total_price = st.number_input("السعر الإجمالي", min_value=0.0)
+            paid = st.checkbox("مدفوع")
+            submitted = st.form_submit_button("إضافة ائتمان")
+            if submitted:
+                add_credit(customer_name, product_name, quantity, total_price, paid)
+                st.success("تم إضافة الائتمان")
+
+        st.subheader("قائمة الائتمان")
+        credits_df = get_credits()
+        st.dataframe(credits_df)
 
     with tab4:
         st.header("إدارة المستخدمين")
