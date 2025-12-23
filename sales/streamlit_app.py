@@ -40,8 +40,9 @@ def init_db():
     # إضافة مستخدم افتراضي إذا لم يكن موجوداً
     c.execute("SELECT * FROM users WHERE username = ?", ("admin",))
     if not c.fetchone():
+        hashed_password = stauth.Hasher.hash("password123")
         c.execute("INSERT INTO users (username, name, password) VALUES (?, ?, ?)",
-                  ("admin", "Administrator", "password123"))
+                  ("admin", "Administrator", hashed_password))
     conn.commit()
     conn.close()
 
