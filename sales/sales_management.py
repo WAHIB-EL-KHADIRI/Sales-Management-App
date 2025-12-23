@@ -28,18 +28,14 @@ class SalesManagementSystem:
         self.master.title("نظام إدارة المبيعات")
         self.master.geometry("1200x700")
 
-        # إنشاء اتصال قاعدة البيانات
         self.conn = sqlite3.connect('sales_management.db')
         self.create_tables()
         self.create_indexes()
 
-        # تحميل الأيقونات
         self.load_icons()
 
-        # إنشاء القائمة الرئيسية
         self.create_menu()
 
-        # إنشاء علامات التبويب
         self.notebook = ttk.Notebook(self.master)
         self.notebook.pack(expand=True, fill="both", padx=10, pady=10)
 

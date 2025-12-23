@@ -7,7 +7,6 @@ import io
 import requests
 from PIL import Image
 
-# إعداد قاعدة البيانات
 def init_db():
     conn = sqlite3.connect('sales_management.db')
     c = conn.cursor()
@@ -49,7 +48,6 @@ def init_db():
 
 init_db()
 
-# تحميل المستخدمين من قاعدة البيانات
 def load_users():
     conn = sqlite3.connect('sales_management.db')
     c = conn.cursor()
