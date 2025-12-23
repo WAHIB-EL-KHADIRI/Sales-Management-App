@@ -75,7 +75,13 @@ else:
         df = pd.read_sql_query("SELECT id, username, name FROM users", conn)
         conn.close()
         return df
-    def add_user(username, name, password):
+
+    def delete_user(user_id):
+        conn = sqlite3.connect('sales_management.db')
+        c = conn.cursor()
+        c.execute("DELETE FROM users WHERE id = ?", (user_id,))
+        conn.commit()
+        conn.close()
         conn = sqlite3.connect('sales_management.db')
         c = conn.cursor()
         try:
@@ -105,6 +111,13 @@ else:
         df = pd.read_sql_query("SELECT * FROM products", conn)
         conn.close()
         return df
+
+    def delete_product(product_id):
+        conn = sqlite3.connect('sales_management.db')
+        c = conn.cursor()
+        c.execute("DELETE FROM products WHERE id = ?", (product_id,))
+        conn.commit()
+        conn.close()
 
     def add_sale(product_name, quantity, total_price):
         conn = sqlite3.connect('sales_management.db')
@@ -150,6 +163,13 @@ else:
         conn.close()
         return df
 
+    def delete_sale(sale_id):
+        conn = sqlite3.connect('sales_management.db')
+        c = conn.cursor()
+        c.execute("DELETE FROM sales WHERE id = ?", (sale_id,))
+        conn.commit()
+        conn.close()
+
     def add_credit(customer_name, product_name, quantity, total_price, paid):
         conn = sqlite3.connect('sales_management.db')
         c = conn.cursor()
@@ -181,6 +201,13 @@ else:
         conn.close()
         return df
 
+    def delete_credit(credit_id):
+        conn = sqlite3.connect('sales_management.db')
+        c = conn.cursor()
+        c.execute("DELETE FROM credits WHERE id = ?", (credit_id,))
+        conn.commit()
+        conn.close()
+
     # واجهة Streamlit
     st.set_page_config(page_title="إدارة المبيعات", layout="wide")
 
@@ -202,7 +229,26 @@ else:
 
         st.subheader("قائمة المنتجات")
         products_df = get_products()
-        st.dataframe(products_df)
+        if not products_df.empty:
+            for index, row in products_df.iterrows():
+                col1, col2, col3, col4, col5, col6 = st.columns([2,2,2,2,2,1])
+                with col1:
+                    st.write(row['name'])
+                with col2:
+                    st.write(row['price'])
+                with col3:
+                    st.write(row['quantity'])
+                with col4:
+                    st.write(row['category'])
+                with col5:
+                    st.write(row['id'])
+                with col6:
+                    if st.button("حذف", key=f"delete_{row['id']}"):
+                        delete_product(row['id'])
+                        st.success("تم حذف المنتج")
+                        st.rerun()
+        else:
+            st.write("لا توجد منتجات")
 
     with tab2:
         st.header("إدارة المبيعات")
@@ -221,7 +267,26 @@ else:
             sales_df = get_sales(product_filter)
         else:
             sales_df = get_sales()
-        st.dataframe(sales_df)
+        if not sales_df.empty:
+            for index, row in sales_df.iterrows():
+                col1, col2, col3, col4, col5, col6 = st.columns([1,2,2,2,2,1])
+                with col1:
+                    st.write(row['id'])
+                with col2:
+                    st.write(row['name'])
+                with col3:
+                    st.write(row['quantity'])
+                with col4:
+                    st.write(row['total_price'])
+                with col5:
+                    st.write(row['date'])
+                with col6:
+                    if st.button("حذف", key=f"delete_sale_{row['id']}"):
+                        delete_sale(row['id'])
+                        st.success("تم حذف البيع")
+                        st.rerun()
+        else:
+            st.write("لا توجد مبيعات")
 
     with tab3:
         st.header("إدارة الائتمان")
@@ -238,7 +303,30 @@ else:
 
         st.subheader("قائمة الائتمان")
         credits_df = get_credits()
-        st.dataframe(credits_df)
+        if not credits_df.empty:
+            for index, row in credits_df.iterrows():
+                col1, col2, col3, col4, col5, col6, col7, col8 = st.columns([1,2,2,2,2,2,1,1])
+                with col1:
+                    st.write(row['id'])
+                with col2:
+                    st.write(row['customer_name'])
+                with col3:
+                    st.write(row['name'])
+                with col4:
+                    st.write(row['quantity'])
+                with col5:
+                    st.write(row['total_price'])
+                with col6:
+                    st.write(row['date'])
+                with col7:
+                    st.write("نعم" if row['paid'] else "لا")
+                with col8:
+                    if st.button("حذف", key=f"delete_credit_{row['id']}"):
+                        delete_credit(row['id'])
+                        st.success("تم حذف الائتمان")
+                        st.rerun()
+        else:
+            st.write("لا توجد ائتمان")
 
     with tab4:
         st.header("إدارة المستخدمين")
@@ -252,4 +340,21 @@ else:
 
         st.subheader("قائمة المستخدمين")
         users_df = get_users()
-        st.dataframe(users_df)
+        if not users_df.empty:
+            for index, row in users_df.iterrows():
+                col1, col2, col3, col4, col5 = st.columns([1,2,2,2,1])
+                with col1:
+                    st.write(row['id'])
+                with col2:
+                    st.write(row['username'])
+                with col3:
+                    st.write(row['name'])
+                with col4:
+                    st.write("***")  # لا نعرض كلمة المرور
+                with col5:
+                    if st.button("حذف", key=f"delete_user_{row['id']}"):
+                        delete_user(row['id'])
+                        st.success("تم حذف المستخدم")
+                        st.rerun()
+        else:
+            st.write("لا يوجد مستخدمون")
