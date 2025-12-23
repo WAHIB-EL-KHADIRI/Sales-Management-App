@@ -1,5 +1,4 @@
 import streamlit as st
-import streamlit_authenticator as stauth
 import sqlite3
 import pandas as pd
 from datetime import datetime
@@ -7,14 +6,10 @@ import io
 import requests
 from PIL import Image
 
+# إعداد قاعدة البيانات
 def init_db():
     conn = sqlite3.connect('sales_management.db')
     c = conn.cursor()
-    c.execute('''CREATE TABLE IF NOT EXISTS users (
-                    id INTEGER PRIMARY KEY,
-                    username TEXT UNIQUE,
-                    name TEXT,
-                    password TEXT)''')
     c.execute('''CREATE TABLE IF NOT EXISTS products (
                     id INTEGER PRIMARY KEY,
                     name TEXT UNIQUE,
@@ -37,45 +32,25 @@ def init_db():
                     date TEXT,
                     paid INTEGER,
                     FOREIGN KEY (product_id) REFERENCES products (id))''')
-    # إضافة مستخدم افتراضي إذا لم يكن موجوداً
-    c.execute("SELECT * FROM users WHERE username = ?", ("admin",))
-    if not c.fetchone():
-        hashed_password = stauth.Hasher.hash("password123")
-        c.execute("INSERT INTO users (username, name, password) VALUES (?, ?, ?)",
-                  ("admin", "Administrator", hashed_password))
     conn.commit()
     conn.close()
 
 init_db()
 
-def load_users():
-    conn = sqlite3.connect('sales_management.db')
-    c = conn.cursor()
-    c.execute("SELECT username, name, password FROM users")
-    users_data = c.fetchall()
-    conn.close()
-    users = {}
-    for username, name, password in users_data:
-        users[username] = {"name": name, "password": password}
-    return users
+# دخول بسيط
+if 'logged_in' not in st.session_state:
+    st.session_state.logged_in = False
 
-users = load_users()
-
-authenticator = stauth.Authenticate(
-    credentials={"usernames": users},
-    cookie_name="sales_app",
-    cookie_expiry_days=30
-)
-
-name, authentication_status, username = authenticator.login("تسجيل الدخول", location="main", key="login_key")
-
-if authentication_status == False:
-    st.error("اسم المستخدم أو كلمة المرور غير صحيحة")
-elif authentication_status == None:
-    st.warning("يرجى إدخال اسم المستخدم وكلمة المرور")
-elif authentication_status:
-    st.success(f"مرحبا {name}!")
-    authenticator.logout("تسجيل خروج", "sidebar")
+if not st.session_state.logged_in:
+    password = st.text_input("كلمة المرور", type="password")
+    if st.button("دخول"):
+        if password == "password123":
+            st.session_state.logged_in = True
+            st.success("تم الدخول بنجاح!")
+            st.rerun()
+        else:
+            st.error("كلمة مرور خاطئة")
+else:
 
     # وظائف قاعدة البيانات
     def add_user(username, name, password):
