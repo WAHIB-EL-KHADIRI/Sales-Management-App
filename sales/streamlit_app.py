@@ -63,7 +63,6 @@ users = load_users()
 authenticator = stauth.Authenticate(
     credentials={"usernames": users},
     cookie_name="sales_app",
-    key="sales_key",
     cookie_expiry_days=30
 )
 
