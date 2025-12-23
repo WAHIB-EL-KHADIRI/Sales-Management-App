@@ -229,26 +229,13 @@ else:
 
         st.subheader("قائمة المنتجات")
         products_df = get_products()
-        if not products_df.empty:
-            for index, row in products_df.iterrows():
-                col1, col2, col3, col4, col5, col6 = st.columns([2,2,2,2,2,1])
-                with col1:
-                    st.write(row['name'])
-                with col2:
-                    st.write(row['price'])
-                with col3:
-                    st.write(row['quantity'])
-                with col4:
-                    st.write(row['category'])
-                with col5:
-                    st.write(row['id'])
-                with col6:
-                    if st.button("حذف", key=f"delete_{row['id']}"):
-                        delete_product(row['id'])
-                        st.success("تم حذف المنتج")
-                        st.rerun()
-        else:
-            st.write("لا توجد منتجات")
+        st.dataframe(products_df)
+        with st.form("delete_product"):
+            product_id = st.number_input("أدخل ID المنتج لحذفه", min_value=1)
+            submitted = st.form_submit_button("حذف المنتج")
+            if submitted:
+                delete_product(product_id)
+                st.success("تم حذف المنتج")
 
     with tab2:
         st.header("إدارة المبيعات")
@@ -267,26 +254,13 @@ else:
             sales_df = get_sales(product_filter)
         else:
             sales_df = get_sales()
-        if not sales_df.empty:
-            for index, row in sales_df.iterrows():
-                col1, col2, col3, col4, col5, col6 = st.columns([1,2,2,2,2,1])
-                with col1:
-                    st.write(row['id'])
-                with col2:
-                    st.write(row['name'])
-                with col3:
-                    st.write(row['quantity'])
-                with col4:
-                    st.write(row['total_price'])
-                with col5:
-                    st.write(row['date'])
-                with col6:
-                    if st.button("حذف", key=f"delete_sale_{row['id']}"):
-                        delete_sale(row['id'])
-                        st.success("تم حذف البيع")
-                        st.rerun()
-        else:
-            st.write("لا توجد مبيعات")
+        st.dataframe(sales_df)
+        with st.form("delete_sale"):
+            sale_id = st.number_input("أدخل ID البيع لحذفه", min_value=1)
+            submitted = st.form_submit_button("حذف البيع")
+            if submitted:
+                delete_sale(sale_id)
+                st.success("تم حذف البيع")
 
     with tab3:
         st.header("إدارة الائتمان")
@@ -303,30 +277,13 @@ else:
 
         st.subheader("قائمة الائتمان")
         credits_df = get_credits()
-        if not credits_df.empty:
-            for index, row in credits_df.iterrows():
-                col1, col2, col3, col4, col5, col6, col7, col8 = st.columns([1,2,2,2,2,2,1,1])
-                with col1:
-                    st.write(row['id'])
-                with col2:
-                    st.write(row['customer_name'])
-                with col3:
-                    st.write(row['name'])
-                with col4:
-                    st.write(row['quantity'])
-                with col5:
-                    st.write(row['total_price'])
-                with col6:
-                    st.write(row['date'])
-                with col7:
-                    st.write("نعم" if row['paid'] else "لا")
-                with col8:
-                    if st.button("حذف", key=f"delete_credit_{row['id']}"):
-                        delete_credit(row['id'])
-                        st.success("تم حذف الائتمان")
-                        st.rerun()
-        else:
-            st.write("لا توجد ائتمان")
+        st.dataframe(credits_df)
+        with st.form("delete_credit"):
+            credit_id = st.number_input("أدخل ID الائتمان لحذفه", min_value=1)
+            submitted = st.form_submit_button("حذف الائتمان")
+            if submitted:
+                delete_credit(credit_id)
+                st.success("تم حذف الائتمان")
 
     with tab4:
         st.header("إدارة المستخدمين")
@@ -340,21 +297,10 @@ else:
 
         st.subheader("قائمة المستخدمين")
         users_df = get_users()
-        if not users_df.empty:
-            for index, row in users_df.iterrows():
-                col1, col2, col3, col4, col5 = st.columns([1,2,2,2,1])
-                with col1:
-                    st.write(row['id'])
-                with col2:
-                    st.write(row['username'])
-                with col3:
-                    st.write(row['name'])
-                with col4:
-                    st.write("***")  # لا نعرض كلمة المرور
-                with col5:
-                    if st.button("حذف", key=f"delete_user_{row['id']}"):
-                        delete_user(row['id'])
-                        st.success("تم حذف المستخدم")
-                        st.rerun()
-        else:
-            st.write("لا يوجد مستخدمون")
+        st.dataframe(users_df)
+        with st.form("delete_user"):
+            user_id = st.number_input("أدخل ID المستخدم لحذفه", min_value=1)
+            submitted = st.form_submit_button("حذف المستخدم")
+            if submitted:
+                delete_user(user_id)
+                st.success("تم حذف المستخدم")
