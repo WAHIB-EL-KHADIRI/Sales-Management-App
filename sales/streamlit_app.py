@@ -48,7 +48,7 @@ if 'logged_in' not in st.session_state:
 if not st.session_state.logged_in:
     password = st.text_input("كلمة المرور", type="password")
     if st.button("دخول"):
-        if password == "password123":
+        if password == "T9!mA4#qL2@x":
             st.session_state.logged_in = True
             st.success("تم الدخول بنجاح!")
             st.rerun()
